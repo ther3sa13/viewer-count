@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Viewer Counter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      text-align: center;
+      padding: 50px;
+    }
+    h2 {
+      font-size: 28px;
+    }
+    #viewerCount {
+      font-size: 48px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h2>👁️ Live Viewers: <span id="viewerCount">0</span></h2>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const presenceRef = db.ref("presence");
+
+    // Create unique session ID
+    const sessionId = "id_" + Math.random().toString(36).substr(2, 9);
+    const userRef = presenceRef.child(sessionId);
+    userRef.set(true);
+    userRef.onDisconnect().remove();
+
+    // Update count on change
+    presenceRef.on("value", (snapshot) => {
+      const count = snapshot.numChildren();
+      document.getElementById("viewerCount").innerText = count;
+    });
+  </script>
+</body>
+</html>
